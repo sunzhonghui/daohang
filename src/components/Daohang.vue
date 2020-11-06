@@ -1,11 +1,78 @@
-# 一个简单的导航网站
+<template>
+  <div class="container" id="container">
+        <aside class="left-bar" id="leftBar">
+            <div class="title">
+                <p>IDMISS导航</p>
+            </div>
+            <nav class="nav">
+                <div class="item active"><a href=""><i class="iconfont icon-daohang2"></i>导航列表</a><i class="line"></i></div>
+                <ul class="nav-item" id="navItem">
+                    <li v-for="(data, index) in dataList" v-show="searchFilter1(data)"><a :href="'#'+data.puri" :class="('#'+data.puri)==phash?'active':''">
+                        <i class="iconfont" :class="'icon-'+data.puri"></i>{{data.pname}}</a></li>
+                </ul>
+                <div class="item comment"><a target="_blank" href="http://www.idmiss.com/message"><i class="iconfont icon-liuyan"></i>留言</a></div>
+            </nav>
+        </aside>
+        <section class="main">
+            <div id="mainContent">
+                
+                <!-- 手机端菜单 -->
+                <div id="menu-box">
+                   <div id="menu" @click="oMenu">
+                       <input type="checkbox" id="menu-form">
+                       <label for="menu-form" class="menu-spin">
+                        <div class="line diagonal line-1"></div>
+                        <div class="line horizontal"></div>
+                        <div class="line diagonal line-2"></div>
+                      </label>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <input placeholder="Search" type="search" v-model="searchData">
+                </div>
 
-> 可以根据json 动态配置菜单跟内容
-> vue 构建
+                
+                <!-- 开发社区 -->
+                <div class="box" v-for="(data, pindex) in dataList" v-if="searchFilter1(data)">
+                    <a href="#" :name="data.puri"></a>
+                    <div class="sub-category">
+                        <div><i class="iconfont " :class="'icon-'+data.puri"></i>{{data.pname}}</div>
+                    </div>
+                    <div>
+                        <a v-for="cdata in data.data" target="_blank" :href="cdata.uri" v-if="searchFilter(cdata,pindex)">
+                            <div class="item">
+                                <div class="logo" v-if="cdata.icon&&cdata.icon!=''"><img :src="cdata.icon" alt="cdata.name"> {{cdata.name}}</div>
+                                <div class="no-logo" v-if="!cdata.icon||cdata.icon==''">{{cdata.name}}</div>
+                                <div class="desc" v-if="cdata.desc&&cdata.desc!=''">{{cdata.desc}}</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <div class="copyright">
+                        <div>
+                            Copyright © 2018- 2050 京ICP备18015788号-3
+                            <a href="http://www.idmiss.com">IDMISS导航</a>
+                        </div>
+                    </div>
+                </footer>
+                <div @click="toTop" ><svg class="Zi Zi--BackToTop" title="回到顶部" fill="currentColor" viewBox="0 0 24 24" width="24" height="24"><path d="M16.036 19.59a1 1 0 0 1-.997.995H9.032a.996.996 0 0 1-.997-.996v-7.005H5.03c-1.1 0-1.36-.633-.578-1.416L11.33 4.29a1.003 1.003 0 0 1 1.412 0l6.878 6.88c.782.78.523 1.415-.58 1.415h-3.004v7.005z"></path></svg></div>
+              </div>
+        </section>
+      </div>
 
-现在的数据
-```
- [{
+</template>
+
+<script>
+  import "../assets/css/style.css"
+  import "../assets/css/iconfont.css"
+export default {
+  name: 'Daohang',
+  data () {
+    return {
+        searchData:null,
+    phash:this.$route.hash,        // 开发社区  链接 uri，名称name，图标icon，描述desc
+      dataList: [{
     pname: '破解软件',
     puri: 'bbs',
     data: [{
@@ -213,20 +280,148 @@
             name: 'Linux yum安装svn',
             uri: 'https://www.linuxidc.com/Linux/2017-10/147871.htm'
         }]
-}]
-```
-## 构建
+}],
+    }
+  },
+  filters:{
+    
 
-``` bash
-# install dependencies
-npm install
+  },
+  methods: {
+    searchFilter1:function(data){
+        let that=this;
+        if(that.searchData!=null&&that.searchData!=''){
+                       for(var i=0;i<data.data.length;i++){
+                        if(data.data[i].name.toLowerCase().indexOf(that.searchData.toLowerCase())!==-1 || (data.data[i].desc && data.data[i].desc.toLowerCase().indexOf(that.searchData.toLowerCase())!==-1)){
+                             return true;
+                        }
+                       }
+                       return false;
+        }else{
+                    return true;
+                }
+    },
+    searchFilter:function(cdata,pindex){
+        if(this.searchData!=null&&this.searchData!=''){
+                        if(cdata.name.toLowerCase().indexOf(this.searchData.toLowerCase())!==-1 || (cdata.desc && cdata.desc.toLowerCase().indexOf(this.searchData.toLowerCase())!==-1)){
+                             return true;
+                        }else{
+                            return false;
+                        }
+        }else{
+                    return true;
+                }
+    },
+    toTop:function(){
+      $('html,body').animate({scrollTop:'0px'},800);
+    },
+    oMenu:function(){
+        var oLeftBar = document.getElementById('leftBar');
+        var menuFrom = document.getElementById('menu-form');
+            if (oLeftBar.offsetLeft == 0) {
+                oLeftBar.style.left = -249 + 'px';
+            }
+            else {
+                oLeftBar.style.left = 0;
+            }
+    },
+    judgeWidth:function() {
+        var oLeftBar = document.getElementById('leftBar');
+        var menuFrom = document.getElementById('menu-form');
+            if (document.documentElement.clientWidth > 481) {
+                oLeftBar.style.left = 0;
+            } else {
+                oLeftBar.style.left = -249 + 'px';
+            }
+        }
 
-# serve with hot reload at localhost:8080
-npm run dev
 
-# build for production with minification
-npm run build
+  },
+  mounted(){
+    var oLeftBar = document.getElementById('leftBar');
+     var menuFrom = document.getElementById('menu-form');
+    var oNavItem = document.getElementById('navItem');
+        var aA = oNavItem.getElementsByTagName('a');
+        for (var i = 0; i < aA.length; i++) {
+            aA[i].onclick = function() {
+                for (var j = 0; j < aA.length; j++) {
+                    aA[j].className = '';
+                }
+                this.className = 'active';
+                if (oLeftBar.offsetLeft == 0) {
+                    if (document.documentElement.clientWidth <= 481) {
+                        oLeftBar.style.left = -249 + 'px';
+                        menuFrom.checked = false;
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+                    }
+                }
+            }
+        }
+
+    $(window).scroll(function() {
+            if($(window).scrollTop() >= 200){
+                $('#fixedBar').fadeIn(300);
+            }else{
+                $('#fixedBar').fadeOut(300);
+            }
+        });
+        $('#fixedBar').click(function() {
+            $('html,body').animate({scrollTop:'0px'},800);
+        })
+
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+input {
+    outline: none;
+}
+input[type=search] {
+    -webkit-appearance: textfield;
+    -webkit-box-sizing: content-box;
+    font-family: inherit;
+    font-size: 100%;
+}
+input::-webkit-search-decoration,
+input::-webkit-search-cancel-button {
+    display: none; 
+}
+
+
+input[type=search] {
+    background: #ededed url(http://images.idmiss.com/image/daohang/search-icon.png) no-repeat 9px center;
+    border: solid 1px #ccc;
+    padding: 9px 10px 9px 32px;
+    width: 55px;
+    
+    -webkit-border-radius: 10em;
+    -moz-border-radius: 10em;
+    border-radius: 10em;
+    
+    -webkit-transition: all .5s;
+    -moz-transition: all .5s;
+    transition: all .5s;
+}
+input[type=search]:focus {
+    width: 230px;
+    background-color: #fff;
+    border-color: #66CC75;
+    
+    -webkit-box-shadow: 0 0 5px rgba(109,207,246,.5);
+    -moz-box-shadow: 0 0 5px rgba(109,207,246,.5);
+    box-shadow: 0 0 5px rgba(109,207,246,.5);
+}
+
+
+input:-moz-placeholder {
+    color: #999;
+}
+input::-webkit-input-placeholder {
+    color: #999;
+}
+.search-box{
+    padding-top:15px;
+}
+</style>
