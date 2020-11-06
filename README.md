@@ -1,5 +1,7 @@
 # 一个简单的导航网站
 
+线上地址：[http://daohang.idmiss.com](http://daohang.idmiss.com)
+
 > 可以根据json 动态配置菜单跟内容
 > vue 构建
 
